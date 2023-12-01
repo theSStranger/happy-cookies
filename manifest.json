@@ -1,9 +1,9 @@
 {
-    "name": "Cookie Clearer",
+    "name": "Cookie Management Dashboard",
     "manifest_version": 3,
     "version": "1.0",
     "description": "Uses the chrome.cookies API by letting a user delete their cookies via a popup.",
-    "permissions": ["cookies", "activeTab","notifications"],
+    "permissions": ["cookies", "activeTab","notifications","downloads"],
     "host_permissions": ["<all_urls>"],
     "background": {
       "service_worker": "background.js"
