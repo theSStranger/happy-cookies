@@ -1,0 +1,50 @@
+<!-- <!DOCTYPE html>
+<html>
+  <head>
+    <script src="popup.js" type="module"></script>
+  </head>
+  <body>
+    <form id="control-row">
+      <label for="input">Domain:</label>
+      <input type="text" id="input" />
+      <br />
+      <button id="go">Clear Cookies</button>
+    </form>
+    <span id="message" hidden></span>
+  </body>
+</html> -->
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cookie Manager</title>
+  <link rel="stylesheet" type="text/css" href="popup.css">
+  <script src="popup.js" type="module"></script>
+</head>
+<body>
+  <form id="control-row">
+    <label for="input">Domain:</label>
+    <input type="text" id="input" />
+    <br />
+    <button id="go">Clear Cookies</button>
+  </form>
+  <span id="message" hidden></span>
+
+  <div id="cookie-list">
+    <h3>Cookies for Domain:</h3>
+    <ul id="cookies"></ul>
+  </div>
+
+  <button id="toggleChanges">Show All Cookie Changes</button>
+
+  <div id="cookie-changes">
+    <h3>Recent Cookie Changes:</h3>
+    <ul id="changes-list"></ul>
+  </div>
+</body>
+</html>
+
+
