@@ -146,11 +146,13 @@ async function displayCookies(domain) {
             const interpretedValue = interpretCookieValue(cookie.value);
             listItem.textContent = `Name: ${cookie.name}, Value: ${cookie.value}, TrueValue: ${interpretedValue} , Purpose: ${purpose}, Domain: ${cookie.domain}, Path: ${cookie.path}`;
             cookiesList.appendChild(listItem);
+        });
+        cookies.forEach(cookie => {
             const issues = analyzeCookieSecurity(cookie);
             if (issues.length > 0) {
                 securityIssues.push(`Cookie ${cookie.name} has the following issues: ${issues.join(', ')}`);
             }
-        });
+        })
         displaySecurityIssues(securityIssues);
     } catch (error) {
         setMessage(`Error fetching cookies: ${error.message}`);
