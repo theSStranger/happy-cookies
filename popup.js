@@ -222,7 +222,7 @@ function generateCookieText(cookie) {
     const showInterpretedValue = document.getElementById('show-interpreted-value').checked;
     const showPurpose = document.getElementById('show-purpose').checked;
     const showDomain = document.getElementById('show-domain').checked;
-    const showPath = document.getElementById('show-path').checked;
+    // const showPath = document.getElementById('show-path').checked;
     
   
     let text = '';
@@ -234,7 +234,7 @@ function generateCookieText(cookie) {
     }
     if (showPurpose) text += `Purpose: ${getCookiePurpose(cookie.name)}, `;
     if (showDomain) text += `Domain: ${cookie.domain}, `;
-    if (showPath) text += `Path: ${cookie.path}, `;
+    // if (showPath) text += `Path: ${cookie.path}, `;
   
     // Trim any trailing comma and space
     return text.replace(/, $/, '');

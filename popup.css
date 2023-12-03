@@ -1,69 +1,107 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 10px;
-    color: #333;
-  }
-  
-  form#control-row {
-    margin-bottom: 20px;
-  }
-  
-  label {
-    margin-right: 10px;
-  }
-  
-  input[type="text"] {
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px;
-    margin-right: 10px;
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
-  span#message {
-    display: block;
-    margin-top: 10px;
-    color: red;
-  }
-  
-  #cookie-changes {
-    margin-top: 20px;
-  }
-  
-  #cookie-changes h3 {
-    margin-bottom: 10px;
-  }
-  
-  ul#changes-list {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  ul#changes-list li {
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
-    margin-top: 5px;
-    padding: 8px;
-    border-radius: 4px;
-  }
-  
+  font-family: Arial, sans-serif;
+  background-color: #f4f7f6;
+  /* Soft greenish background */
+  color: #333333;
+  margin: 10px;
+  padding: 10px;
+}
+
+h3 {
+  color: #2a9d8f;
+  /* Calming green for headings */
+}
+
+#field-selectors label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+#field-selectors input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.section {
+  border: 1px solid #8ab6d6;
+  /* Soft blue for borders */
+  padding: 10px;
+  margin-top: 15px;
+  border-radius: 5px;
+  background-color: #e9f1f3;
+  /* Light blue background for sections */
+}
+
+.button {
+  background-color: #264653;
+  /* Darker blue for buttons */
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+form#control-row {
+  margin-bottom: 20px;
+}
+
+label {
+  margin-right: 10px;
+}
+
+input[type="text"] {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px;
+  margin-right: 10px;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+button:hover {
+  background-color: #2a9d8f;
+}
+
+span#message {
+  display: block;
+  margin-top: 10px;
+  color: red;
+}
+
+#cookie-changes {
+  margin-top: 20px;
+}
+
+#cookie-changes h3 {
+  margin-bottom: 10px;
+}
+
+ul#changes-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+ul#changes-list li {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+  padding: 8px;
+  border-radius: 4px;
+}
+
 /* The switch - the box around the slider */
 .toggle-switch-label {
   position: relative;
@@ -95,15 +133,15 @@ body {
   border-radius: 34px;
 }
 
-.toggle-switch-checkbox:checked + .toggle-switch-label::after {
+.toggle-switch-checkbox:checked+.toggle-switch-label::after {
   transform: translateX(26px);
 }
 
-.toggle-switch-checkbox:focus + .toggle-switch-label {
+.toggle-switch-checkbox:focus+.toggle-switch-label {
   box-shadow: 0 0 1px #2196F3;
 }
 
-.toggle-switch-checkbox:checked + .toggle-switch-label {
+.toggle-switch-checkbox:checked+.toggle-switch-label {
   background-color: #2196F3;
 }
 
@@ -112,14 +150,27 @@ body {
   content: 'OFF';
   position: absolute;
   right: 5px;
-  line-height: 34px; /* Vertically center the text */
+  line-height: 34px;
+  /* Vertically center the text */
   color: #fff;
   transition: 0.4s;
 }
 
-.toggle-switch-checkbox:checked + .toggle-switch-label::before {
+.toggle-switch-checkbox:checked+.toggle-switch-label::before {
   content: 'ON';
   left: 5px;
   right: auto;
   color: #fff;
+}
+
+
+#cookies-list, #security-issues-list, #changes-list {
+  list-style: none;
+  padding: 0;
+}
+
+#cookies-list li, #security-issues-list li, #changes-list li {
+  padding: 5px;
+  margin-bottom: 5px;
+  border-bottom: 1px solid #8ab6d6;
 }
