@@ -192,17 +192,9 @@ async function displayCookies(domain) {
         const cookies = await chrome.cookies.getAll({
             domain
         });
-        displayConsentCookies(cookies)
-        const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
-        cookiesList.innerHTML = '';
+        displayConsentCookies(cookies);
+        displayNonConsentCookies(cookies);
         let securityIssues = [];
-        const privacyScore = calculatePrivacyScore(nonConsentCookies);
-        privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
-        nonConsentCookies.forEach(cookie => {
-            const listItem = document.createElement('li');
-            listItem.textContent = generateCookieText(cookie);
-            cookiesList.appendChild(listItem);
-        });
         cookies.forEach(cookie => {
             const issues = analyzeCookieSecurity(cookie);
             if (issues.length > 0) {
@@ -213,6 +205,21 @@ async function displayCookies(domain) {
     } catch (error) {
         setMessage(`Error fetching cookies: ${error.message}`);
     }
+}
+
+async function displayNonConsentCookies(domain) {
+    const cookies = await chrome.cookies.getAll({
+        domain
+    });
+    const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
+    cookiesList.innerHTML = '';
+    const privacyScore = calculatePrivacyScore(nonConsentCookies);
+    privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
+    nonConsentCookies.forEach(cookie => {
+        const listItem = document.createElement('li');
+        listItem.textContent = generateCookieText(cookie);
+        cookiesList.appendChild(listItem);
+    });
 }
 
 function generateCookieText(cookie) {
@@ -247,7 +254,7 @@ document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(che
       // Refresh the cookies display when any checkbox changes
       const urlObject = stringToUrl(input.value);
       if (urlObject) {
-        displayCookies(urlObject.hostname);
+        displayNonConsentCookies(urlObject.hostname);
       }
     });
   });
