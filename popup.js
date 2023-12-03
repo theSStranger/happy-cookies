@@ -91,21 +91,36 @@ function displayConsentCookies(cookies) {
     const denyValues = ["no", "false", "dismiss"]
     const consentCookies = cookies.filter(cookie => 
         consentNames.some(consentName => cookie.name.includes(consentName)));
-    consentCookies.forEach(cookie => {
+    consentCookies.forEach(function(cookie,index) {
         const listItem = document.createElement('li');
+        listItem.textContent = `Consent status:`
+
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.id = 'toggle-switch-' + index;
+        checkbox.className = 'toggle-switch-checkbox';
+        var label = document.createElement('label');
+        label.htmlFor = 'toggle-switch-' + index;
+        label.className = 'toggle-switch-label';
+
         if (allowValues.includes(cookie.value)) {
-            listItem.textContent = `Consent status: Allow`;
+            checkbox.checked = true;
         } else if (denyValues.includes(cookie.value)) {
-            listItem.textContent = `Consent status: Deny`
+            checkbox.cheked = false;
         } else {
             listItem.textContent = `Consent status: Unknown`
         }
-        
-        // Add toggle button
-        var toggleButton = document.createElement('button');
-        toggleButton.textContent = 'Toggle';
-        listItem.appendChild(toggleButton);
-        toggleButton.className = 'toggle-button';
+
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                
+            } else {
+                
+            }
+        });
+
+        listItem.appendChild(checkbox)
+        listItem.appendChild(label)
 
         consentStatus.appendChild(listItem);
     });
