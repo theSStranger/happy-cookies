@@ -9,6 +9,18 @@ const consentStatus = document.getElementById('consent-status')
 
 const consentNames = ["cookieconsent_status", "cookieconsent_dismissed"]
 
+let turnOffMap = {
+    "yes": "no",
+    "true": "false",
+    "allow": "dismiss"
+}
+let turnOnMap = {
+    "no": "yes",
+    "false": "true",
+    "dismiss": "allow"
+}
+
+
 // When the popup opens
 chrome.runtime.sendMessage({
     popupOpen: true
@@ -106,17 +118,34 @@ function displayConsentCookies(cookies) {
         if (allowValues.includes(cookie.value)) {
             checkbox.checked = true;
         } else if (denyValues.includes(cookie.value)) {
-            checkbox.cheked = false;
+            checkbox.checked = false;
         } else {
             listItem.textContent = `Consent status: Unknown`
         }
 
         checkbox.addEventListener('change', function() {
+            let newCookieValue = "";
             if (this.checked) {
-                
+                newCookieValue = turnOffMap.get(cookie.name);
             } else {
-                
+                newCookieValue = turnOnMap.get(cookie.name);
             }
+            chrome.cookies.set({
+                url: "https://" + cookie.domain + cookie.path, 
+                name: cookie.name,
+                value: newCookieValue, 
+                domain: cookie.domain,
+                path: cookie.path,
+                secure: cookie.secure,
+                httpOnly: cookie.httpOnly,
+                expirationDate: cookie.expirationDate
+            }, function(updatedCookie) {
+                if (chrome.runtime.lastError) {
+                    console.error('Error setting cookie:', chrome.runtime.lastError);
+                } else {
+                    console.log('Updated Cookie:', updatedCookie);
+                }
+            });
         });
 
         listItem.appendChild(checkbox)
