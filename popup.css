@@ -1,10 +1,12 @@
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f7f6;
-  /* Soft greenish background */
   color: #333333;
   margin: 10px;
   padding: 10px;
+  width: 500px; /* Fixed width */
+  overflow-y: auto; /* Allows vertical scrolling if content overflows */
+  box-sizing: border-box; /* Include padding and border in width */
 }
 
 h3 {
@@ -22,13 +24,16 @@ h3 {
 }
 
 .section {
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  /* overflow: auto; Enables scrolling if content overflows */
   border: 1px solid #8ab6d6;
-  /* Soft blue for borders */
   padding: 10px;
   margin-top: 15px;
+  /* margin: auto; */
   border-radius: 5px;
   background-color: #e9f1f3;
-  /* Light blue background for sections */
+  width: 80%; /* Percentage of the container's width */
+  /* Other properties */
 }
 
 .button {
@@ -55,6 +60,9 @@ input[type="text"] {
   border-radius: 4px;
   padding: 8px;
   margin-right: 10px;
+  box-sizing: border-box; /* Include padding and border in width and height */
+  max-width: 100%; /* Prevent it from overflowing its container */
+  width: auto; /* Adjust width based on the content and container size */
 }
 
 button {
@@ -164,6 +172,24 @@ ul#changes-list li {
 }
 
 
+#cookie-list ul {
+  padding: 0;
+  list-style-type: none;
+}
+
+#cookie-list ul li {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  margin-top: 5px;
+  padding: 8px;
+  border-radius: 4px;
+  box-sizing: border-box;
+  max-width: 100%; /* Ensures the list item doesn't exceed its container */
+  overflow: hidden; /* Hide overflow */
+  /* white-space: nowrap; Prevent text from wrapping to the next line */
+  text-overflow: ellipsis; /* Add ellipsis for overflowed text */
+}
+
 #cookies-list, #security-issues-list, #changes-list {
   list-style: none;
   padding: 0;
@@ -173,4 +199,31 @@ ul#changes-list li {
   padding: 5px;
   margin-bottom: 5px;
   border-bottom: 1px solid #8ab6d6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal; /* Ensure the text behaves normally regarding white spaces and wrapping */
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+  .section {
+      width: 100%; /* Full width on smaller screens */
+  }
+}
+
+.section, form#control-row, #cookie-changes, #cookie-list, #consent-statuses {
+  max-width: 100%; /* Ensure these elements fit within the body */
+  /* Other existing styles */
+}
+
+@media screen and (max-width: 600px) {
+  input[type="text"] {
+    width: 100%; /* Full width on smaller screens */
+    margin-right: 0; /* Remove margin on smaller screens if needed */
+  }
+}
+
+input[type="text"], button {
+  width: 100%; /* Makes input fields and buttons full width of their parent container */
 }

@@ -25,7 +25,7 @@
   <script src="popup.js" type="module"></script>
 </head>
 <body>
-  <form id="control-row">
+  <form class="section" id="control-row">
     <label for="input">Domain:</label>
     <input type="text" id="input" />
     <br />
@@ -38,6 +38,7 @@
   </div>
 
   <div class="section" id="field-selectors">
+    <h3>Fields to Show:</h3>
     <label><input type="checkbox" id="show-name" >Name</label>
     <label><input type="checkbox" id="show-value" >Value</label>
     <label><input type="checkbox" id="show-interpreted-value" >Interpreted Value</label>
@@ -61,9 +62,10 @@
     <span id="privacy-score"></span>
   </div>
 
-  <button id="toggleChanges">Show All Cookie Changes</button>
+  
 
-  <div id="cookie-changes">
+  <div class="section" id="cookie-changes">
+    <button id="toggleChanges">Show All Cookie Changes</button>
     <h3>Recent Cookie Changes:</h3>
     <ul id="changes-list"></ul>
   </div>
