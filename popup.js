@@ -200,9 +200,7 @@ async function displayCookies(domain) {
         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
         nonConsentCookies.forEach(cookie => {
             const listItem = document.createElement('li');
-            const purpose = getCookiePurpose(cookie.name);
-            const interpretedValue = interpretCookieValue(cookie.value);
-            listItem.textContent = `Name: ${cookie.name}, Value: ${cookie.value}, TrueValue: ${interpretedValue} , Purpose: ${purpose}, Domain: ${cookie.domain}, Path: ${cookie.path}`;
+            listItem.textContent = generateCookieText(cookie);
             cookiesList.appendChild(listItem);
         });
         cookies.forEach(cookie => {
@@ -216,6 +214,43 @@ async function displayCookies(domain) {
         setMessage(`Error fetching cookies: ${error.message}`);
     }
 }
+
+function generateCookieText(cookie) {
+    // ... existing checkbox checks ...
+    const showName = document.getElementById('show-name').checked;
+    const showValue = document.getElementById('show-value').checked;
+    const showInterpretedValue = document.getElementById('show-interpreted-value').checked;
+    const showPurpose = document.getElementById('show-purpose').checked;
+    const showDomain = document.getElementById('show-domain').checked;
+    const showPath = document.getElementById('show-path').checked;
+    
+  
+    let text = '';
+    if (showName) text += `Name: ${cookie.name}, `;
+    if (showValue) text += `Value: ${cookie.value}, `;
+    if (showInterpretedValue) {
+      const interpretedValue = interpretCookieValue(cookie.value);
+      text += `Interpreted Value: ${interpretedValue}, `;
+    }
+    if (showPurpose) text += `Purpose: ${getCookiePurpose(cookie.name)}, `;
+    if (showDomain) text += `Domain: ${cookie.domain}, `;
+    if (showPath) text += `Path: ${cookie.path}, `;
+  
+    // Trim any trailing comma and space
+    return text.replace(/, $/, '');
+  }
+
+
+// Event listeners for checkboxes
+document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', () => {
+      // Refresh the cookies display when any checkbox changes
+      const urlObject = stringToUrl(input.value);
+      if (urlObject) {
+        displayCookies(urlObject.hostname);
+      }
+    });
+  });
 
 function analyzeCookieSecurity(cookie) {
     let issues = [];
