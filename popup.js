@@ -100,6 +100,13 @@ function displayConsentCookies(cookies) {
         } else {
             listItem.textContent = `Consent status: Unknown`
         }
+        
+        // Add toggle button
+        var toggleButton = document.createElement('button');
+        toggleButton.textContent = 'Toggle';
+        listItem.appendChild(toggleButton);
+        toggleButton.className = 'toggle-button';
+
         consentStatus.appendChild(listItem);
     });
 }

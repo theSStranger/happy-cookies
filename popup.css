@@ -64,3 +64,11 @@ body {
     border-radius: 4px;
   }
   
+  #consent-status li {
+    display: flex;
+    align-items: center;
+  }
+
+  .toggle-button {
+      margin-left: 10px; /* Add some space between the list item text and the button */
+  }
