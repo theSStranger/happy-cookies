@@ -5,6 +5,9 @@ const changesList = document.getElementById('changes-list');
 const cookiesList = document.getElementById('cookies');
 const securityIssuesList = document.getElementById('security-issues');
 const privacyScoreDisplay = document.getElementById('privacy-score');
+const consentStatus = document.getElementById('consent-status')
+
+const consentNames = ["cookieconsent_status", "cookieconsent_dismissed"]
 
 // When the popup opens
 chrome.runtime.sendMessage({
@@ -83,6 +86,17 @@ toggleChangesButton.addEventListener('click', () => {
     updateChangesList();
 });
 
+function displayConsentCookies(cookies) {
+    const allowedValues = ["yes", "true", "allow"]
+    const consentCookies = cookies.filter(cookie => 
+        consentNames.some(consentName => cookie.name.includes(consentName)));
+    consentCookies.forEach(cookie => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `Consent status: Allow`
+        consentStatus.appendChild(listItem);
+    });
+}
+
 // interpretCookieValue() decodes and parses cookie values
 function interpretCookieValue(value) {
     try {
@@ -120,11 +134,13 @@ async function displayCookies(domain) {
         const cookies = await chrome.cookies.getAll({
             domain
         });
+        displayConsentCookies(cookies)
+        const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
         cookiesList.innerHTML = '';
         let securityIssues = [];
-        const privacyScore = calculatePrivacyScore(cookies);
+        const privacyScore = calculatePrivacyScore(nonConsentCookies);
         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
-        cookies.forEach(cookie => {
+        nonConsentCookies.forEach(cookie => {
             const listItem = document.createElement('li');
             const purpose = getCookiePurpose(cookie.name);
             const interpretedValue = interpretCookieValue(cookie.value);
