@@ -87,12 +87,19 @@ toggleChangesButton.addEventListener('click', () => {
 });
 
 function displayConsentCookies(cookies) {
-    const allowedValues = ["yes", "true", "allow"]
+    const allowValues = ["yes", "true", "allow"]
+    const denyValues = ["no", "false", "dismiss"]
     const consentCookies = cookies.filter(cookie => 
         consentNames.some(consentName => cookie.name.includes(consentName)));
     consentCookies.forEach(cookie => {
         const listItem = document.createElement('li');
-        listItem.textContent = `Consent status: Allow`
+        if (allowValues.includes(cookie.value)) {
+            listItem.textContent = `Consent status: Allow`;
+        } else if (denyValues.includes(cookie.value)) {
+            listItem.textContent = `Consent status: Deny`
+        } else {
+            listItem.textContent = `Consent status: Unknown`
+        }
         consentStatus.appendChild(listItem);
     });
 }
