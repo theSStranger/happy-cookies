@@ -12,12 +12,12 @@ const consentNames = ["cookieconsent_status", "cookieconsent_dismissed"]
 let turnOffMap = {
     "yes": "no",
     "true": "false",
-    "allow": "dismiss"
+    "allow": "deny"
 }
 let turnOnMap = {
     "no": "yes",
     "false": "true",
-    "dismiss": "allow"
+    "deny": "allow"
 }
 
 
@@ -125,17 +125,20 @@ function displayConsentCookies(cookies) {
 
         checkbox.addEventListener('change', function() {
             let newCookieValue = "";
-            var element = document.getElementById('test');
-            if (this.checked) {
+            // var element = document.getElementById('test');
+            if (!this.checked) {
                 newCookieValue = turnOffMap[cookie.value];
             } else {
                 newCookieValue = turnOnMap[cookie.value];
             }
+            // element.textContent = "Cookie value: " + cookie.value
+            //     + " Mapping: " + turnOffMap[cookie.value]
+            //     + " New value: " + newCookieValue;
             chrome.cookies.set({
                 url: cookie.url,
                 name: cookie.name,
                 value: newCookieValue,
-                domain: "ufp.teamviewer.com",
+                domain: ".ufp.teamviewer.com",
                 url: "http://" + cookie.domain.slice(1) + cookie.path,
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
