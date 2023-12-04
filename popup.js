@@ -125,27 +125,29 @@ function displayConsentCookies(cookies) {
 
         checkbox.addEventListener('change', function() {
             let newCookieValue = "";
+            var element = document.getElementById('test');
             if (this.checked) {
-                newCookieValue = turnOffMap.get(cookie.name);
+                newCookieValue = turnOffMap[cookie.value];
             } else {
-                newCookieValue = turnOnMap.get(cookie.name);
+                newCookieValue = turnOnMap[cookie.value];
             }
             chrome.cookies.set({
-                url: "https://" + cookie.domain + cookie.path, 
+                url: cookie.url,
                 name: cookie.name,
-                value: newCookieValue, 
-                domain: cookie.domain,
-                path: cookie.path,
+                value: newCookieValue,
+                domain: "ufp.teamviewer.com",
+                url: "http://" + cookie.domain.slice(1) + cookie.path,
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
                 expirationDate: cookie.expirationDate
             }, function(updatedCookie) {
+                element.textContent = "callback";
                 if (chrome.runtime.lastError) {
-                    console.error('Error setting cookie:', chrome.runtime.lastError);
+                    element.textContent = chrome.runtime.lastError.message;
                 } else {
-                    console.log('Updated Cookie:', updatedCookie);
+                    element.textContent = "success";
                 }
-            });
+            });;
         });
 
         listItem.appendChild(checkbox)
