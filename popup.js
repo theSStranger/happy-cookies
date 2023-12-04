@@ -16,12 +16,12 @@ const consentNames = ["cookieconsent_status", "cookieconsent_dismissed"]
 let turnOffMap = {
     "yes": "no",
     "true": "false",
-    "allow": "dismiss"
+    "allow": "deny"
 }
 let turnOnMap = {
     "no": "yes",
     "false": "true",
-    "dismiss": "allow"
+    "deny": "allow"
 }
 
 
@@ -174,27 +174,33 @@ function displayConsentCookies(cookies) {
 
         checkbox.addEventListener('change', function() {
             let newCookieValue = "";
-            if (this.checked) {
-                newCookieValue = turnOffMap.get(cookie.name);
+            // var element = document.getElementById('test');
+            if (!this.checked) {
+                newCookieValue = turnOffMap[cookie.value];
             } else {
-                newCookieValue = turnOnMap.get(cookie.name);
+                newCookieValue = turnOnMap[cookie.value];
             }
+            // element.textContent = "Cookie value: " + cookie.value
+            //     + " Mapping: " + turnOffMap[cookie.value]
+            //     + " New value: " + newCookieValue;
+            // element.textContent = cookie.domain;
             chrome.cookies.set({
-                url: "https://" + cookie.domain + cookie.path, 
+                url: cookie.url,
                 name: cookie.name,
-                value: newCookieValue, 
+                value: newCookieValue,
                 domain: cookie.domain,
-                path: cookie.path,
+                url: "http://" + cookie.domain.slice(1) + cookie.path,
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
                 expirationDate: cookie.expirationDate
             }, function(updatedCookie) {
+                element.textContent = "callback";
                 if (chrome.runtime.lastError) {
-                    console.error('Error setting cookie:', chrome.runtime.lastError);
+                    element.textContent = chrome.runtime.lastError.message;
                 } else {
-                    console.log('Updated Cookie:', updatedCookie);
+                    element.textContent = "success";
                 }
-            });
+            });;
         });
 
         listItem.appendChild(checkbox)
@@ -270,9 +276,8 @@ async function displayCookies(domain, filter) {
         const cookies = await chrome.cookies.getAll({
             domain
         });
-        displayConsentCookies(cookies)
-        const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
-        cookiesList.innerHTML = '';
+        displayConsentCookies(cookies);
+        displayNonConsentCookies(cookies);
         let securityIssues = [];
         const privacyScore = calculatePrivacyScore(nonConsentCookies);
         const filteredCookies = filterCookies(nonConsentCookies, filter);
@@ -322,6 +327,21 @@ function filterCookies(cookies, filter) {
     });
 }
 
+async function displayNonConsentCookies(domain) {
+    const cookies = await chrome.cookies.getAll({
+        domain
+    });
+    const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
+    cookiesList.innerHTML = '';
+    const privacyScore = calculatePrivacyScore(nonConsentCookies);
+    privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
+    nonConsentCookies.forEach(cookie => {
+        const listItem = document.createElement('li');
+        listItem.textContent = generateCookieText(cookie);
+        cookiesList.appendChild(listItem);
+    });
+}
+
 function generateCookieText(cookie) {
     // ... existing checkbox checks ...
     const showName = document.getElementById('show-name').checked;
@@ -356,6 +376,7 @@ document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(che
       // Refresh the cookies display when any checkbox changes
       const urlObject = stringToUrl(domainInput.value);
       if (urlObject) {
+        displayNonConsentCookies(urlObject.hostname);
         displayCookies(urlObject.hostname, filterInput.value);
       }
     });
