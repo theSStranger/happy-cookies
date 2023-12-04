@@ -25,11 +25,12 @@
   <script src="popup.js" type="module"></script>
 </head>
 <body>
+
+
   <form class="section" id="control-row">
-    <label for="input">Domain:</label>
-    <input type="text" id="input" />
-    <br />
-    <button id="go">Clear Cookies</button>
+    <input type="text" id="domain-input" placeholder="Enter a domain" />
+    <button id="show-cookies">Show All Cookies</button>
+    <button id="clear-cookies">Clear Cookies</button>
   </form>
   <span id="message" hidden></span>
   <div id="consent-statuses">
@@ -38,7 +39,10 @@
   </div>
 
   <div class="section" id="field-selectors">
+    <input type="text" id="filterInput" placeholder="e.g. Purpose : Session management">
+    <button id="filterButton">Filter</button>
     <h3>Fields to Show:</h3>
+    <!-- <input type="text" id="filter-input" placeholder="eg" /> -->
     <label><input type="checkbox" id="show-name" >Name</label>
     <label><input type="checkbox" id="show-value" >Value</label>
     <label><input type="checkbox" id="show-interpreted-value" >Interpreted Value</label>

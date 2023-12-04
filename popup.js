@@ -1,11 +1,15 @@
 const form = document.getElementById('control-row');
-const input = document.getElementById('input');
 const message = document.getElementById('message');
 const changesList = document.getElementById('changes-list');
 const cookiesList = document.getElementById('cookies');
 const securityIssuesList = document.getElementById('security-issues');
 const privacyScoreDisplay = document.getElementById('privacy-score');
 const consentStatus = document.getElementById('consent-status')
+const domainInput = document.getElementById('domain-input');
+const fetchInfoButton = document.getElementById('fetch-info');
+const filterInput = document.getElementById('filterInput');
+const filterButton = document.getElementById('filterButton');
+
 
 const consentNames = ["cookieconsent_status", "cookieconsent_dismissed"]
 
@@ -36,15 +40,36 @@ chrome.runtime.sendMessage({
     if (tab && tab.url) {
         try {
             let url = new URL(tab.url);
-            input.value = url.hostname;
-            displayCookies(url.hostname);
+            domainInput.value = url.hostname;
+            displayCookies(url.hostname, filterInput.value);
         } catch {
             // ignore
         }
     }
 
-    input.focus();
+    domainInput.focus();
 })();
+
+// Add an event listener to the filter input for when the user enters text
+filterButton.addEventListener('click', function() {
+    const filterValue = filterInput.value.toLowerCase();
+    const domain = domainInput.value; // Corrected: get the domain from the domainInput field
+    displayCookies(domain, filterValue); // Corrected: use a comma to separate arguments
+});
+
+document.getElementById('show-cookies').addEventListener('click', (event) => {
+    event.preventDefault();
+    displayCookies(domainInput.value, filterInput.value);
+  });
+  
+  document.getElementById('clear-cookies').addEventListener('click', async (event) => {
+    event.preventDefault();
+    const domain =domainInput.value;
+    let msg = await deleteDomainCookies(domain);
+    setMessage(msg);
+    displayCookies(domain , filterInput.value);
+  });
+  
 
 function getCookiePurpose(cookieName) {
     // Common cookie name patterns and their possible purposes
@@ -57,7 +82,31 @@ function getCookiePurpose(cookieName) {
         'pref': 'Preferences',
         'cart': 'Shopping cart',
         'ads': 'Advertising',
-        'track': 'Tracking'
+        'track': 'Tracking',
+        'token': 'Authentication',
+        'remember': 'Remember me',
+        'gradescope_session': 'Gradescope session',
+        'csrftoken': 'CSRF protection',
+        'csrf': 'CSRF protection',
+        'wordpress': 'WordPress authentication',
+        'comment': 'Commenting',
+        'consent': 'Consent management',
+        'cookie': 'Cookie management',
+        'privacy': 'Privacy settings',
+        'cookielaw': 'Cookie consent',
+        'cookietest': 'Cookie consent test',
+        'cookie_notice': 'Cookie consent',
+        'cookieconsent': 'Cookie consent',  
+        'cookie_consent': 'Cookie consent',
+        'cookie-agree': 'Cookie consent',
+        'cookie_decline': 'Cookie consent',
+        'cookie-preferences': 'Cookie consent',
+        'cookie_policy': 'Cookie consent',
+        'cookiebanner': 'Cookie consent',
+        'cookiecontrol': 'Cookie consent',
+        'cookie_notice_accepted': 'Cookie consent',
+        'cookiesDirective': 'Cookie consent',
+
         // Add more patterns and purposes as needed
     };
 
@@ -187,7 +236,36 @@ function calculatePrivacyScore(cookies) {
 }
 
 
-async function displayCookies(domain) {
+// async function displayCookies(domain) {
+//     try {
+//         const cookies = await chrome.cookies.getAll({
+//             domain
+//         });
+//         displayConsentCookies(cookies)
+//         const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
+//         cookiesList.innerHTML = '';
+//         let securityIssues = [];
+//         const privacyScore = calculatePrivacyScore(nonConsentCookies);
+//         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
+//         nonConsentCookies.forEach(cookie => {
+//             const listItem = document.createElement('li');
+//             listItem.innerHTML = generateCookieText(cookie);
+//             cookiesList.appendChild(listItem);
+//         });
+//         cookies.forEach(cookie => {
+//             const issues = analyzeCookieSecurity(cookie);
+//             if (issues.length > 0) {
+//                 securityIssues.push(`Cookie ${cookie.name} has the following issues: ${issues.join(', ')}`);
+//             }
+//         })
+//         displaySecurityIssues(securityIssues);
+//     } catch (error) {
+//         setMessage(`Error fetching cookies: ${error.message}`);
+//     }
+// }
+
+
+async function displayCookies(domain, filter) {
     try {
         const cookies = await chrome.cookies.getAll({
             domain
@@ -197,10 +275,11 @@ async function displayCookies(domain) {
         cookiesList.innerHTML = '';
         let securityIssues = [];
         const privacyScore = calculatePrivacyScore(nonConsentCookies);
+        const filteredCookies = filterCookies(nonConsentCookies, filter);
         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
-        nonConsentCookies.forEach(cookie => {
+        filteredCookies.forEach(cookie => {
             const listItem = document.createElement('li');
-            listItem.textContent = generateCookieText(cookie);
+            listItem.innerHTML = generateCookieText(cookie);
             cookiesList.appendChild(listItem);
         });
         cookies.forEach(cookie => {
@@ -215,6 +294,34 @@ async function displayCookies(domain) {
     }
 }
 
+
+function filterCookies(cookies, filter) {
+    if (!filter) {
+        return cookies; // If no filter is provided, return all cookies
+    }
+    // Split the filter input into field name and value
+    const [fieldName, filterValue] = filter.split(':').map(part => part.trim());
+
+    // Filter cookies based on field name and value
+    return cookies.filter(cookie => {
+        switch (fieldName.toLowerCase()) {
+            case 'name':
+                return cookie.name.toLowerCase().includes(filterValue.toLowerCase());
+            case 'value':
+                return cookie.value.toLowerCase().includes(filterValue.toLowerCase());
+            case 'domain':
+                return cookie.domain.toLowerCase().includes(filterValue.toLowerCase());
+            case 'purpose':
+                return getCookiePurpose(cookie.name).toLowerCase().includes(filterValue.toLowerCase());
+            case 'interpreted value':
+                return interpretCookieValue(cookie.value).toLowerCase().includes(filterValue.toLowerCase());
+            // Add more cases for other fields if needed
+            default:
+                return false; // Invalid field name
+        }
+    });
+}
+
 function generateCookieText(cookie) {
     // ... existing checkbox checks ...
     const showName = document.getElementById('show-name').checked;
@@ -226,18 +333,20 @@ function generateCookieText(cookie) {
     
   
     let text = '';
-    if (showName) text += `Name: ${cookie.name}, `;
-    if (showValue) text += `Value: ${cookie.value}, `;
+    if (showName) text += `<strong>Name:</strong> ${cookie.name}<br> `;
+    if (showValue) text += `<strong>Value:</strong> ${cookie.value}<br> `;
     if (showInterpretedValue) {
       const interpretedValue = interpretCookieValue(cookie.value);
-      text += `Interpreted Value: ${interpretedValue}, `;
+      text += `<strong>Interpreted Value:</strong> ${interpretedValue}<br>`;
     }
-    if (showPurpose) text += `Purpose: ${getCookiePurpose(cookie.name)}, `;
-    if (showDomain) text += `Domain: ${cookie.domain}, `;
+    if (showPurpose) text += `<strong>Purpose:</strong> ${getCookiePurpose(cookie.name)}<br> `;
+    if (showDomain) text += `<strong>Domain:</strong> ${cookie.domain}<br> `;
     // if (showPath) text += `Path: ${cookie.path}, `;
   
     // Trim any trailing comma and space
-    return text.replace(/, $/, '');
+    return text.replace(/<br>, $/, '');
+    // return text.replace(/, $/, '');
+    
   }
 
 
@@ -245,9 +354,9 @@ function generateCookieText(cookie) {
 document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', () => {
       // Refresh the cookies display when any checkbox changes
-      const urlObject = stringToUrl(input.value);
+      const urlObject = stringToUrl(domainInput.value);
       if (urlObject) {
-        displayCookies(urlObject.hostname);
+        displayCookies(urlObject.hostname, filterInput.value);
       }
     });
   });
@@ -305,7 +414,7 @@ async function handleFormSubmit(event) {
     event.preventDefault();
     clearMessage();
 
-    let url = stringToUrl(input.value);
+    let url = stringToUrl(domainInput.value);
     if (!url) {
         setMessage('Invalid URL');
         return;
@@ -313,7 +422,7 @@ async function handleFormSubmit(event) {
 
     let msg = await deleteDomainCookies(url.hostname);
     setMessage(msg);
-    displayCookies(url.hostname);
+    displayCookies(url.hostname, filterInput.value);
 }
 
 function stringToUrl(input) {
