@@ -134,11 +134,12 @@ function displayConsentCookies(cookies) {
             // element.textContent = "Cookie value: " + cookie.value
             //     + " Mapping: " + turnOffMap[cookie.value]
             //     + " New value: " + newCookieValue;
+            // element.textContent = cookie.domain;
             chrome.cookies.set({
                 url: cookie.url,
                 name: cookie.name,
                 value: newCookieValue,
-                domain: ".ufp.teamviewer.com",
+                domain: cookie.domain,
                 url: "http://" + cookie.domain.slice(1) + cookie.path,
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
