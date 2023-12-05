@@ -172,6 +172,29 @@ ul#changes-list li {
 }
 
 
+#filterButton {
+  background-color: #007bff; /* Blue background */
+  color: white; /* White text color */
+  /* Rest of your styling (padding, border, etc.) */
+}
+
+#filterButton:hover {
+  background-color: #0056b3; /* Darker blue on hover */
+}
+
+
+#clear-cookies {
+  background-color: red; /* Red background */
+  color: white; /* White text color */
+  /* Rest of your styling (padding, border, etc.) */
+}
+
+#clear-cookies:hover {
+  background-color: darkred; /* Darker red on hover */
+}
+
+
+
 #cookie-list ul {
   padding: 0;
   list-style-type: none;
@@ -204,6 +227,21 @@ ul#changes-list li {
   white-space: normal; /* Ensure the text behaves normally regarding white spaces and wrapping */
   box-sizing: border-box;
   max-width: 100%;
+}
+
+.delete-button {
+  background-color: red; /* Red background */
+  color: white; /* White text color */
+  padding: 5px 10px; /* Smaller padding */
+  font-size: 12px; /* Smaller font size */
+  border: none; /* No border */
+  border-radius: 4px; /* Rounded corners */
+  cursor: pointer;
+  margin-left: 10px; /* Space from the preceding content */
+}
+
+.delete-button:hover {
+  background-color: darkred; /* Darker red on hover */
 }
 
 @media screen and (max-width: 600px) {

@@ -273,10 +273,13 @@ async function displayNonConsentCookies(domain, filter) {
         filteredCookies.forEach(cookie => {
             const cookieItem = document.createElement('li');
             cookieItem.innerHTML = generateCookieText(cookie);
-            cookiesList.appendChild(cookieItem);
+
             // Create and append the delete button
-            // let deleteButton = createDeleteButton(cookie);
-            // cookieItem.appendChild(deleteButton);
+            let deleteButton = createDeleteButton(cookie);
+            cookieItem.appendChild(deleteButton);
+            
+            cookiesList.appendChild(cookieItem);
+            
         });
         cookies.forEach(cookie => {
             const issues = analyzeCookieSecurity(cookie);
@@ -291,34 +294,34 @@ async function displayNonConsentCookies(domain, filter) {
 }
 
 
-// Function to create a delete button for each cookie
-// function createDeleteButton(cookie) {
-//     let button = document.createElement('button');
-//     button.textContent = 'Delete';
-//     button.addEventListener('click', function () {
-//         deleteCookie(cookie);
-//     });
-//     return button;
-// }
+function createDeleteButton(cookie) {
+    let button = document.createElement('button');
+    button.textContent = 'Delete';
+    button.className = 'delete-button'; // Add this line
+    button.addEventListener('click', function () {
+        deleteIndividualCookie(cookie);
+    });
+    return button;
+}
 
-// Function to delete a cookie
-// function deleteCookie(cookie) {
-//     const protocol = cookie.secure ? 'https:' : 'http:';
-//     const cookieUrl = `${protocol}//${cookie.domain}${cookie.path}`;
+function deleteIndividualCookie(cookie) {
+    const protocol = cookie.secure ? 'https:' : 'http:';
+    const cookieUrl = `${protocol}//${cookie.domain}${cookie.path}`;
 
-//     chrome.cookies.remove({
-//         url: cookieUrl,
-//         name: cookie.name,
-//         storeId: cookie.storeId
-//     }, function () {
-//         if (chrome.runtime.lastError) {
-//             console.error(`Error deleting cookie: ${chrome.runtime.lastError}`);
-//         } else {
-//             console.log(`Cookie ${cookie.name} deleted`);
-//             // Optional: remove the cookie from the displayed list
-//         }
-//     });
-// }
+    chrome.cookies.remove({
+        url: cookieUrl,
+        name: cookie.name,
+        storeId: cookie.storeId
+    }, function () {
+        if (chrome.runtime.lastError) {
+            console.error(`Error deleting cookie: ${chrome.runtime.lastError}`);
+        } else {
+            console.log(`Cookie ${cookie.name} deleted`);
+            // Optional: Refresh the cookies list to reflect the deletion
+            displayNonConsentCookies(domainInput.value, filterInput.value);
+        }
+    });
+}
 
 
 function filterCookies(cookies, filter) {
