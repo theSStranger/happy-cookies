@@ -214,24 +214,25 @@ function displayConsentCookiesPerCategory(category, cookies) {
     });
 }
 
-async function displayConsentCookies(domain) {
+async function displayConsentCookies(domain, filter) {
     // Display general consent cookies
     const cookies = await chrome.cookies.getAll({
         domain
     });
-    const consentCookies = cookies.filter(cookie => 
+    const filteredCookies = filterCookies(cookies, filter);
+    const consentCookies = filteredCookies.filter(cookie => 
         consentNames.some(consentName => cookie.name.includes(consentName)));
     displayConsentCookiesPerCategory('Essential', consentCookies);
 
-    const marketingCookies = cookies.filter(cookie => 
+    const marketingCookies = filteredCookies.filter(cookie => 
         marketingNames.some(marketingName => cookie.name.includes(marketingName)));
     displayConsentCookiesPerCategory('Marketing', marketingCookies);
     
-    const personalizationCookies = cookies.filter(cookie => 
+    const personalizationCookies = filteredCookies.filter(cookie => 
         personalizationNames.some(personalizationName => cookie.name.includes(personalizationName)));
     displayConsentCookiesPerCategory('Personalization', personalizationCookies);
 
-    const analyticsCookies = cookies.filter(cookie => 
+    const analyticsCookies = filteredCookies.filter(cookie => 
         analyticsNames.some(analyticsName => cookie.name.includes(analyticsName)));
     displayConsentCookiesPerCategory('Analytical', analyticsCookies);
 }
