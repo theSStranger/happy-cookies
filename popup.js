@@ -258,7 +258,7 @@ function calculatePrivacyScore(cookies) {
 //             domain
 //         });
 //         displayConsentCookies(cookies)
-//         const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
+        // const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
 //         cookiesList.innerHTML = '';
 //         let securityIssues = [];
 //         const privacyScore = calculatePrivacyScore(nonConsentCookies);
@@ -287,23 +287,20 @@ async function displayCookies(domain, filter) {
             domain
         });
         displayConsentCookies(cookies);
-        displayNonConsentCookies(cookies);
+        // displayNonConsentCookies(domain);
+        const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
         let securityIssues = [];
         const privacyScore = calculatePrivacyScore(nonConsentCookies);
         const filteredCookies = filterCookies(nonConsentCookies, filter);
         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
 
-
         filteredCookies.forEach(cookie => {
             const cookieItem = document.createElement('li');
             cookieItem.innerHTML = generateCookieText(cookie);
             cookiesList.appendChild(cookieItem);
-
             // Create and append the delete button
             // let deleteButton = createDeleteButton(cookie);
             // cookieItem.appendChild(deleteButton);
-
-
         });
         cookies.forEach(cookie => {
             const issues = analyzeCookieSecurity(cookie);
