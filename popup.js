@@ -11,21 +11,26 @@ const filterInput = document.getElementById('filterInput');
 const filterButton = document.getElementById('filterButton');
 
 
-const consentNames = ["cookieconsent_status", "cookieconsent_dismissed"]
+const consentNames = ["cookieconsent"];
+const analyticsNames = ["Analytic", "analytic"];
+const marketingNames = ["Market", "market", "Advertis", "advertis", "Target", "target"];
+const personalizationNames = ["Personalization", "personalization", "Function", "function"];
 
 let turnOffMap = {
     "yes": "no",
     "true": "false",
-    "allow": "deny"
+    "allow": "deny",
+    "1": "0"
 }
 let turnOnMap = {
     "no": "yes",
     "false": "true",
-    "deny": "allow"
+    "deny": "allow",
+    "0": "1"
 }
 
-const allowValues = ["yes", "true", "allow"]
-const denyValues = ["no", "false", "dismiss"]
+const allowValues = ["yes", "true", "allow", "1"]
+const denyValues = ["no", "false", "dismiss", "0"]
 
 
 // When the popup opens
@@ -157,17 +162,17 @@ toggleChangesButton.addEventListener('click', () => {
     updateChangesList();
 });
 
-function displayGeneralConsentCookies(consentCookies) {
-    consentCookies.forEach(function (cookie, index) {
+function displayConsentCookiesPerCategory(category, cookies) {
+    cookies.forEach(function(cookie,index) {
         const listItem = document.createElement('li');
-        listItem.textContent = `Consent status:`
+        listItem.textContent = category + ` status:`;
 
         var checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.id = 'toggle-switch-' + index;
+        checkbox.id = 'toggle-switch-' + category + '-' + index;
         checkbox.className = 'toggle-switch-checkbox';
         var label = document.createElement('label');
-        label.htmlFor = 'toggle-switch-' + index;
+        label.htmlFor = 'toggle-switch-' + category + '-' + index;
         label.className = 'toggle-switch-label';
 
         if (allowValues.includes(cookie.value)) {
@@ -175,21 +180,16 @@ function displayGeneralConsentCookies(consentCookies) {
         } else if (denyValues.includes(cookie.value)) {
             checkbox.checked = false;
         } else {
-            listItem.textContent = `Consent status: Unknown`
+            listItem.textContent = category + ` status: Unknown`
         }
 
         checkbox.addEventListener('change', function () {
             let newCookieValue = "";
-            var element = document.getElementById('test');
             if (!this.checked) {
                 newCookieValue = turnOffMap[cookie.value];
             } else {
                 newCookieValue = turnOnMap[cookie.value];
             }
-            element.textContent = "Cookie value: " + cookie.value
-                + " Mapping: " + turnOffMap[cookie.value]
-                + " New value: " + newCookieValue;
-            element.textContent = cookie.domain;
             chrome.cookies.set({
                 name: cookie.name,
                 value: newCookieValue,
@@ -221,7 +221,19 @@ async function displayConsentCookies(domain) {
     });
     const consentCookies = cookies.filter(cookie => 
         consentNames.some(consentName => cookie.name.includes(consentName)));
-    displayGeneralConsentCookies(consentCookies);
+    displayConsentCookiesPerCategory('Essential', consentCookies);
+
+    const marketingCookies = cookies.filter(cookie => 
+        marketingNames.some(marketingName => cookie.name.includes(marketingName)));
+    displayConsentCookiesPerCategory('Marketing', marketingCookies);
+    
+    const personalizationCookies = cookies.filter(cookie => 
+        personalizationNames.some(personalizationName => cookie.name.includes(personalizationName)));
+    displayConsentCookiesPerCategory('Personalization', personalizationCookies);
+
+    const analyticsCookies = cookies.filter(cookie => 
+        analyticsNames.some(analyticsName => cookie.name.includes(analyticsName)));
+    displayConsentCookiesPerCategory('Analytical', analyticsCookies);
 }
 
 // interpretCookieValue() decodes and parses cookie values
