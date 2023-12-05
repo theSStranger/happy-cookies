@@ -45,6 +45,7 @@ chrome.runtime.sendMessage({
             let url = new URL(tab.url);
             domainInput.value = url.hostname;
             displayNonConsentCookies(url.hostname);
+            displayConsentCookies(url.hostname);
         } catch (error) {
             console.error(`Error parsing URL: ${error}`);
             // ignore
@@ -213,8 +214,11 @@ function displayGeneralConsentCookies(consentCookies) {
     });
 }
 
-function displayConsentCookies(cookies) {
+async function displayConsentCookies(domain) {
     // Display general consent cookies
+    const cookies = await chrome.cookies.getAll({
+        domain
+    });
     const consentCookies = cookies.filter(cookie => 
         consentNames.some(consentName => cookie.name.includes(consentName)));
     displayGeneralConsentCookies(consentCookies);
