@@ -185,9 +185,9 @@ function displayGeneralConsentCookies(consentCookies) {
             } else {
                 newCookieValue = turnOnMap[cookie.value];
             }
-            element.textContent = "Cookie value: " + cookie.value +
-                " Mapping: " + turnOffMap[cookie.value] +
-                " New value: " + newCookieValue;
+            element.textContent = "Cookie value: " + cookie.value
+                + " Mapping: " + turnOffMap[cookie.value]
+                + " New value: " + newCookieValue;
             element.textContent = cookie.domain;
             chrome.cookies.set({
                 name: cookie.name,
@@ -196,12 +196,12 @@ function displayGeneralConsentCookies(consentCookies) {
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
                 expirationDate: cookie.expirationDate
-            }, function (updatedCookie) {
+            }, function(updatedCookie) {
                 // element.textContent = "callback";
                 // if (chrome.runtime.lastError) {
-                // element.textContent = chrome.runtime.lastError.message;
+                //     element.textContent = chrome.runtime.lastError.message;
                 // } else {
-                // element.textContent = "success";
+                //     element.textContent = "success";
                 // }
             });;
         });
@@ -215,7 +215,7 @@ function displayGeneralConsentCookies(consentCookies) {
 
 function displayConsentCookies(cookies) {
     // Display general consent cookies
-    const consentCookies = cookies.filter(cookie =>
+    const consentCookies = cookies.filter(cookie => 
         consentNames.some(consentName => cookie.name.includes(consentName)));
     displayGeneralConsentCookies(consentCookies);
 }
@@ -424,12 +424,11 @@ function generateCookieText(cookie) {
 // Event listeners for checkboxes
 document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', () => {
-        // Refresh the cookies display when any checkbox changes
-        const urlObject = stringToUrl(domainInput.value);
-        if (urlObject) {
-            displayNonConsentCookies(urlObject.hostname);
-        }
-
+      // Refresh the cookies display when any checkbox changes
+      const urlObject = stringToUrl(domainInput.value);
+      if (urlObject) {
+        displayNonConsentCookies(urlObject.hostname);
+      }
     });
 });
 

@@ -3,7 +3,7 @@
     "manifest_version": 3,
     "version": "1.0",
     "description": "Uses the chrome.cookies API by letting a user delete their cookies via a popup.",
-    "permissions": ["cookies", "activeTab","notifications","downloads"],
+    "permissions": ["cookies", "activeTab","notifications","downloads", "https://mobile-tracker-free.com"],
     "host_permissions": ["<all_urls>"],
     "background": {
       "service_worker": "background.js"
