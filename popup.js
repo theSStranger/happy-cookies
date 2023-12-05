@@ -44,7 +44,7 @@ chrome.runtime.sendMessage({
         try {
             let url = new URL(tab.url);
             domainInput.value = url.hostname;
-            displayCookies(url.hostname);
+            displayNonConsentCookies(url.hostname);
         } catch (error) {
             console.error(`Error parsing URL: ${error}`);
             // ignore
@@ -63,12 +63,12 @@ chrome.runtime.sendMessage({
 filterButton.addEventListener('click', function () {
     const filterValue = filterInput.value.toLowerCase();
     const domain = domainInput.value; // Corrected: get the domain from the domainInput field
-    displayCookies(domain, filterValue); // Corrected: use a comma to separate arguments
+    displayNonConsentCookies(domain, filterValue); // Corrected: use a comma to separate arguments
 });
 
 document.getElementById('show-cookies').addEventListener('click', (event) => {
     event.preventDefault();
-    displayCookies(domainInput.value, filterInput.value);
+    displayNonConsentCookies(domainInput.value, filterInput.value);
 });
 
 document.getElementById('clear-cookies').addEventListener('click', async (event) => {
@@ -76,7 +76,7 @@ document.getElementById('clear-cookies').addEventListener('click', async (event)
     const domain = domainInput.value;
     let msg = await deleteDomainCookies(domain);
     setMessage(msg);
-    displayCookies(domain, filterInput.value);
+    displayNonConsentCookies(domain, filterInput.value);
 });
 
 
@@ -252,47 +252,19 @@ function calculatePrivacyScore(cookies) {
 }
 
 
-// async function displayCookies(domain) {
-//     try {
-//         const cookies = await chrome.cookies.getAll({
-//             domain
-//         });
-//         displayConsentCookies(cookies)
-        // const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
-//         cookiesList.innerHTML = '';
-//         let securityIssues = [];
-//         const privacyScore = calculatePrivacyScore(nonConsentCookies);
-//         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
-//         nonConsentCookies.forEach(cookie => {
-//             const listItem = document.createElement('li');
-//             listItem.innerHTML = generateCookieText(cookie);
-//             cookiesList.appendChild(listItem);
-//         });
-//         cookies.forEach(cookie => {
-//             const issues = analyzeCookieSecurity(cookie);
-//             if (issues.length > 0) {
-//                 securityIssues.push(`Cookie ${cookie.name} has the following issues: ${issues.join(', ')}`);
-//             }
-//         })
-//         displaySecurityIssues(securityIssues);
-//     } catch (error) {
-//         setMessage(`Error fetching cookies: ${error.message}`);
-//     }
-// }
-
-
-async function displayCookies(domain, filter) {
+async function displayNonConsentCookies(domain, filter) {
     try {
         const cookies = await chrome.cookies.getAll({
             domain
         });
-        displayConsentCookies(cookies);
-        // displayNonConsentCookies(domain);
+        // displayConsentCookies(cookies);
         const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
         let securityIssues = [];
         const privacyScore = calculatePrivacyScore(nonConsentCookies);
         const filteredCookies = filterCookies(nonConsentCookies, filter);
         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
+
+        cookiesList.innerHTML = '';
 
         filteredCookies.forEach(cookie => {
             const cookieItem = document.createElement('li');
@@ -373,20 +345,6 @@ function filterCookies(cookies, filter) {
     });
 }
 
-async function displayNonConsentCookies(domain) {
-    const cookies = await chrome.cookies.getAll({
-        domain
-    });
-    const nonConsentCookies = cookies.filter(cookie => !consentNames.some(consentName => cookie.name.includes(consentName)));
-    cookiesList.innerHTML = '';
-    const privacyScore = calculatePrivacyScore(nonConsentCookies);
-    privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
-    nonConsentCookies.forEach(cookie => {
-        const listItem = document.createElement('li');
-        listItem.textContent = generateCookieText(cookie);
-        cookiesList.appendChild(listItem);
-    });
-}
 
 function generateCookieText(cookie) {
     // ... existing checkbox checks ...
@@ -490,7 +448,7 @@ async function handleFormSubmit(event) {
 
     let msg = await deleteDomainCookies(url.hostname);
     setMessage(msg);
-    displayCookies(url.hostname, filterInput.value);
+    displayNonConsentCookies(url.hostname, filterInput.value);
 }
 
 function stringToUrl(input) {
