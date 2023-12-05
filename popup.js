@@ -24,6 +24,9 @@ let turnOnMap = {
     "deny": "allow"
 }
 
+const allowValues = ["yes", "true", "allow"]
+const denyValues = ["no", "false", "dismiss"]
+
 
 // When the popup opens
 chrome.runtime.sendMessage({
@@ -147,11 +150,7 @@ toggleChangesButton.addEventListener('click', () => {
     updateChangesList();
 });
 
-function displayConsentCookies(cookies) {
-    const allowValues = ["yes", "true", "allow"]
-    const denyValues = ["no", "false", "dismiss"]
-    const consentCookies = cookies.filter(cookie => 
-        consentNames.some(consentName => cookie.name.includes(consentName)));
+function displayGeneralConsentCookies(consentCookies) {
     consentCookies.forEach(function(cookie,index) {
         const listItem = document.createElement('li');
         listItem.textContent = `Consent status:`
@@ -203,11 +202,18 @@ function displayConsentCookies(cookies) {
             });;
         });
 
-        listItem.appendChild(checkbox)
-        listItem.appendChild(label)
+        listItem.appendChild(checkbox);
+        listItem.appendChild(label);
 
         consentStatus.appendChild(listItem);
     });
+}
+
+function displayConsentCookies(cookies) {
+    // Display general consent cookies
+    const consentCookies = cookies.filter(cookie => 
+        consentNames.some(consentName => cookie.name.includes(consentName)));
+    displayGeneralConsentCookies(consentCookies);
 }
 
 // interpretCookieValue() decodes and parses cookie values
@@ -377,7 +383,7 @@ document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(che
       const urlObject = stringToUrl(domainInput.value);
       if (urlObject) {
         displayNonConsentCookies(urlObject.hostname);
-        displayCookies(urlObject.hostname, filterInput.value);
+        // displayCookies(urlObject.hostname, filterInput.value);
       }
     });
   });
