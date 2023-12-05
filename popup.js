@@ -173,32 +173,30 @@ function displayGeneralConsentCookies(consentCookies) {
 
         checkbox.addEventListener('change', function() {
             let newCookieValue = "";
-            // var element = document.getElementById('test');
+            var element = document.getElementById('test');
             if (!this.checked) {
                 newCookieValue = turnOffMap[cookie.value];
             } else {
                 newCookieValue = turnOnMap[cookie.value];
             }
-            // element.textContent = "Cookie value: " + cookie.value
-            //     + " Mapping: " + turnOffMap[cookie.value]
-            //     + " New value: " + newCookieValue;
-            // element.textContent = cookie.domain;
+            element.textContent = "Cookie value: " + cookie.value
+                + " Mapping: " + turnOffMap[cookie.value]
+                + " New value: " + newCookieValue;
+            element.textContent = cookie.domain;
             chrome.cookies.set({
-                url: cookie.url,
                 name: cookie.name,
                 value: newCookieValue,
-                domain: cookie.domain,
-                url: "http://" + cookie.domain.slice(1) + cookie.path,
+                url: "http://" + cookie.domain + cookie.path,
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
                 expirationDate: cookie.expirationDate
             }, function(updatedCookie) {
-                element.textContent = "callback";
-                if (chrome.runtime.lastError) {
-                    element.textContent = chrome.runtime.lastError.message;
-                } else {
-                    element.textContent = "success";
-                }
+                // element.textContent = "callback";
+                // if (chrome.runtime.lastError) {
+                //     element.textContent = chrome.runtime.lastError.message;
+                // } else {
+                //     element.textContent = "success";
+                // }
             });;
         });
 
@@ -383,7 +381,6 @@ document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(che
       const urlObject = stringToUrl(domainInput.value);
       if (urlObject) {
         displayNonConsentCookies(urlObject.hostname);
-        // displayCookies(urlObject.hostname, filterInput.value);
       }
     });
   });
