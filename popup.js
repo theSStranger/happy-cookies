@@ -41,17 +41,23 @@ chrome.runtime.sendMessage({
         try {
             let url = new URL(tab.url);
             domainInput.value = url.hostname;
-            displayCookies(url.hostname, filterInput.value);
-        } catch {
+            displayCookies(url.hostname);
+        } catch (error) {
+            console.error(`Error parsing URL: ${error}`);
             // ignore
         }
+    } else {
+        console.error('No active tab found');
     }
 
     domainInput.focus();
 })();
 
+
+
+
 // Add an event listener to the filter input for when the user enters text
-filterButton.addEventListener('click', function() {
+filterButton.addEventListener('click', function () {
     const filterValue = filterInput.value.toLowerCase();
     const domain = domainInput.value; // Corrected: get the domain from the domainInput field
     displayCookies(domain, filterValue); // Corrected: use a comma to separate arguments
@@ -60,16 +66,16 @@ filterButton.addEventListener('click', function() {
 document.getElementById('show-cookies').addEventListener('click', (event) => {
     event.preventDefault();
     displayCookies(domainInput.value, filterInput.value);
-  });
-  
-  document.getElementById('clear-cookies').addEventListener('click', async (event) => {
+});
+
+document.getElementById('clear-cookies').addEventListener('click', async (event) => {
     event.preventDefault();
-    const domain =domainInput.value;
+    const domain = domainInput.value;
     let msg = await deleteDomainCookies(domain);
     setMessage(msg);
-    displayCookies(domain , filterInput.value);
-  });
-  
+    displayCookies(domain, filterInput.value);
+});
+
 
 function getCookiePurpose(cookieName) {
     // Common cookie name patterns and their possible purposes
@@ -96,7 +102,7 @@ function getCookiePurpose(cookieName) {
         'cookielaw': 'Cookie consent',
         'cookietest': 'Cookie consent test',
         'cookie_notice': 'Cookie consent',
-        'cookieconsent': 'Cookie consent',  
+        'cookieconsent': 'Cookie consent',
         'cookie_consent': 'Cookie consent',
         'cookie-agree': 'Cookie consent',
         'cookie_decline': 'Cookie consent',
@@ -150,9 +156,9 @@ toggleChangesButton.addEventListener('click', () => {
 function displayConsentCookies(cookies) {
     const allowValues = ["yes", "true", "allow"]
     const denyValues = ["no", "false", "dismiss"]
-    const consentCookies = cookies.filter(cookie => 
+    const consentCookies = cookies.filter(cookie =>
         consentNames.some(consentName => cookie.name.includes(consentName)));
-    consentCookies.forEach(function(cookie,index) {
+    consentCookies.forEach(function (cookie, index) {
         const listItem = document.createElement('li');
         listItem.textContent = `Consent status:`
 
@@ -172,7 +178,7 @@ function displayConsentCookies(cookies) {
             listItem.textContent = `Consent status: Unknown`
         }
 
-        checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function () {
             let newCookieValue = "";
             // var element = document.getElementById('test');
             if (!this.checked) {
@@ -193,7 +199,7 @@ function displayConsentCookies(cookies) {
                 secure: cookie.secure,
                 httpOnly: cookie.httpOnly,
                 expirationDate: cookie.expirationDate
-            }, function(updatedCookie) {
+            }, function (updatedCookie) {
                 element.textContent = "callback";
                 if (chrome.runtime.lastError) {
                     element.textContent = chrome.runtime.lastError.message;
@@ -282,10 +288,16 @@ async function displayCookies(domain, filter) {
         const privacyScore = calculatePrivacyScore(nonConsentCookies);
         const filteredCookies = filterCookies(nonConsentCookies, filter);
         privacyScoreDisplay.textContent = `Privacy Score: ${privacyScore}/100`;
+
         filteredCookies.forEach(cookie => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = generateCookieText(cookie);
-            cookiesList.appendChild(listItem);
+            const cookieItem = document.createElement('li');
+            cookieItem.innerHTML = generateCookieText(cookie);
+            cookiesList.appendChild(cookieItem);
+
+            // Create and append the delete button
+            let deleteButton = createDeleteButton(cookie);
+            cookieItem.appendChild(deleteButton);
+
         });
         cookies.forEach(cookie => {
             const issues = analyzeCookieSecurity(cookie);
@@ -297,6 +309,35 @@ async function displayCookies(domain, filter) {
     } catch (error) {
         setMessage(`Error fetching cookies: ${error.message}`);
     }
+}
+
+// Function to create a delete button for each cookie
+function createDeleteButton(cookie) {
+    let button = document.createElement('button');
+    button.textContent = 'Delete';
+    button.addEventListener('click', function () {
+        deleteCookie(cookie);
+    });
+    return button;
+}
+
+// Function to delete a cookie
+function deleteCookie(cookie) {
+    const protocol = cookie.secure ? 'https:' : 'http:';
+    const cookieUrl = `${protocol}//${cookie.domain}${cookie.path}`;
+
+    chrome.cookies.remove({
+        url: cookieUrl,
+        name: cookie.name,
+        storeId: cookie.storeId
+    }, function () {
+        if (chrome.runtime.lastError) {
+            console.error(`Error deleting cookie: ${chrome.runtime.lastError}`);
+        } else {
+            console.log(`Cookie ${cookie.name} deleted`);
+            // Optional: remove the cookie from the displayed list
+        }
+    });
 }
 
 
@@ -320,7 +361,7 @@ function filterCookies(cookies, filter) {
                 return getCookiePurpose(cookie.name).toLowerCase().includes(filterValue.toLowerCase());
             case 'interpreted value':
                 return interpretCookieValue(cookie.value).toLowerCase().includes(filterValue.toLowerCase());
-            // Add more cases for other fields if needed
+                // Add more cases for other fields if needed
             default:
                 return false; // Invalid field name
         }
@@ -350,37 +391,37 @@ function generateCookieText(cookie) {
     const showPurpose = document.getElementById('show-purpose').checked;
     const showDomain = document.getElementById('show-domain').checked;
     // const showPath = document.getElementById('show-path').checked;
-    
-  
+
+
     let text = '';
     if (showName) text += `<strong>Name:</strong> ${cookie.name}<br> `;
     if (showValue) text += `<strong>Value:</strong> ${cookie.value}<br> `;
     if (showInterpretedValue) {
-      const interpretedValue = interpretCookieValue(cookie.value);
-      text += `<strong>Interpreted Value:</strong> ${interpretedValue}<br>`;
+        const interpretedValue = interpretCookieValue(cookie.value);
+        text += `<strong>Interpreted Value:</strong> ${interpretedValue}<br>`;
     }
     if (showPurpose) text += `<strong>Purpose:</strong> ${getCookiePurpose(cookie.name)}<br> `;
     if (showDomain) text += `<strong>Domain:</strong> ${cookie.domain}<br> `;
     // if (showPath) text += `Path: ${cookie.path}, `;
-  
+
     // Trim any trailing comma and space
     return text.replace(/<br>, $/, '');
     // return text.replace(/, $/, '');
-    
-  }
+
+}
 
 
 // Event listeners for checkboxes
 document.querySelectorAll('#field-selectors input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', () => {
-      // Refresh the cookies display when any checkbox changes
-      const urlObject = stringToUrl(domainInput.value);
-      if (urlObject) {
-        displayNonConsentCookies(urlObject.hostname);
-        displayCookies(urlObject.hostname, filterInput.value);
-      }
+        // Refresh the cookies display when any checkbox changes
+        const urlObject = stringToUrl(domainInput.value);
+        if (urlObject) {
+            displayNonConsentCookies(urlObject.hostname);
+            displayCookies(urlObject.hostname, filterInput.value);
+        }
     });
-  });
+});
 
 function analyzeCookieSecurity(cookie) {
     let issues = [];
